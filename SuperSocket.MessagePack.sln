@@ -7,6 +7,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{01DBAD25-8C7
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperSocket.MessagePack", "src\SuperSocket.MessagePack\SuperSocket.MessagePack.csproj", "{AD71A9FB-2727-4F2D-AAAB-C19C9BD08C3B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{2DA26D89-A1F9-47C3-90ED-CDF642F02D60}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperSocket.MessagePack.Tests", "test\SuperSocket.MessagePack.Tests\SuperSocket.MessagePack.Tests.csproj", "{6D12762E-F61B-4228-8991-B18FFA14DC86}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,8 +24,13 @@ Global
 		{AD71A9FB-2727-4F2D-AAAB-C19C9BD08C3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD71A9FB-2727-4F2D-AAAB-C19C9BD08C3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AD71A9FB-2727-4F2D-AAAB-C19C9BD08C3B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D12762E-F61B-4228-8991-B18FFA14DC86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D12762E-F61B-4228-8991-B18FFA14DC86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D12762E-F61B-4228-8991-B18FFA14DC86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D12762E-F61B-4228-8991-B18FFA14DC86}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{AD71A9FB-2727-4F2D-AAAB-C19C9BD08C3B} = {01DBAD25-8C78-4C42-A1F6-706ED55F2CCD}
+		{6D12762E-F61B-4228-8991-B18FFA14DC86} = {2DA26D89-A1F9-47C3-90ED-CDF642F02D60}
 	EndGlobalSection
 EndGlobal
