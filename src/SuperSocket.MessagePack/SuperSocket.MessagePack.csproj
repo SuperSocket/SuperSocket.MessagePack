@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Description>SuperSocket MessagePack integration library providing efficient binary serialization and deserialization for network messages with cross-platform and cross-language compatibility.</Description>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(IncludeMobileTargetFramework) == 'true'">
+    <TargetFrameworks>$(TargetFrameworks);$(MobileTargetFrameworks)</TargetFrameworks>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="SuperSocket.ProtoBase" />
+    <PackageReference Include="MessagePack" />
+  </ItemGroup>
+</Project>
