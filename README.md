@@ -1,5 +1,5 @@
 # SuperSocket.MessagePack
-[![Build Status](https://github.com/SuperSocket/SuperSocket.MessagePack/actions/workflows/build.yml/badge.svg)](https://github.com/SuperSocket/SuperSocket.MessagePack/actions/workflows/build.yml)
+[![build](https://github.com/SuperSocket/SuperSocket.MessagePack/actions/workflows/build.yaml/badge.svg)](https://github.com/SuperSocket/SuperSocket.MessagePack/actions/workflows/build.yaml)
 [![NuGet Version](https://img.shields.io/nuget/v/SuperSocket.MessagePack.svg?style=flat)](https://www.nuget.org/packages/SuperSocket.MessagePack/)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/SuperSocket.MessagePack.svg?style=flat)](https://www.nuget.org/packages/SuperSocket.MessagePack/)
 
