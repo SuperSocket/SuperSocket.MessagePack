@@ -40,12 +40,17 @@ namespace SuperSocket.MessagePack
             if (package == null)
                 throw new ArgumentNullException(nameof(package));
 
+            int typeId = GetMessagePackMessageTypeId(package);
+
             var message = GetMessagePackObject(package);
             if (message == null)
                 throw new ArgumentException("Failed to get MessagePack object from package", nameof(package));
-
-            var messageType = message.GetType();
-            int typeId = GetMessageTypeId(messageType);
+            
+            if (typeId == 0)
+            {
+                var messageType = message.GetType();
+                typeId = GetMessageTypeId(messageType);
+            }
 
             // First serialize to memory to get the size
             byte[] messageBytes = MessagePackSerializer.Serialize(message, _typeRegistry.Options);
@@ -86,9 +91,7 @@ namespace SuperSocket.MessagePack
             {
                 if (!_typeRegistry.TryGetTypeId(messageType, out typeId))
                 {
-                    // If we're using a custom type ID, throw error when not found
-                    if (GetProtobufMessageTypeId(default) != 0)
-                        throw new InvalidOperationException($"Message type {messageType.FullName} is not registered in the type registry");
+                    throw new InvalidOperationException($"Message type {messageType.FullName} is not registered in the type registry");
                 }
             }
 
@@ -99,40 +102,18 @@ namespace SuperSocket.MessagePack
         /// Converts a package info into a MessagePack object.
         /// </summary>
         /// <param name="package">The package.</param>
-        protected abstract object GetMessagePackObject(TPackageInfo package);
+        protected virtual object GetMessagePackObject(TPackageInfo package)
+        {
+            return package;
+        }
 
         /// <summary>
         /// Gets the MessagePack message type ID from the package.
         /// </summary>
         /// <param name="package">The package.</param>
-        protected virtual int GetProtobufMessageTypeId(TPackageInfo package)
+        protected virtual int GetMessagePackMessageTypeId(TPackageInfo package)
         {
             return 0;
-        }
-    }
-
-    /// <summary>
-    /// A concrete implementation of MessagePackPackageEncoder for objects.
-    /// </summary>
-    public class MessagePackPackageEncoder : MessagePackPackageEncoder<object>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MessagePackPackageEncoder"/> class.
-        /// </summary>
-        /// <param name="typeRegistry">The MessagePack type registry to use for encoding</param>
-        public MessagePackPackageEncoder(MessagePackTypeRegistry typeRegistry) 
-            : base(typeRegistry)
-        {
-        }
-
-        /// <summary>
-        /// Returns the object directly as it is already a MessagePack object.
-        /// </summary>
-        /// <param name="package">The package object.</param>
-        /// <returns>The package object itself.</returns>
-        protected override object GetMessagePackObject(object package)
-        {
-            return package;
         }
     }
 }

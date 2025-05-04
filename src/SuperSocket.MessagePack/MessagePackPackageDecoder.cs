@@ -10,6 +10,7 @@ namespace SuperSocket.MessagePack
     /// Provides decoding functionality for binary data into MessagePack objects
     /// </summary>
     public abstract class MessagePackPackageDecoder<TPackageInfo> : IPackageDecoder<TPackageInfo>
+        where TPackageInfo : class
     {
         private readonly MessagePackTypeRegistry _typeRegistry;
 
@@ -66,33 +67,9 @@ namespace SuperSocket.MessagePack
         /// <param name="message">The decoded message</param>
         /// <param name="messageType">The type of the message</param>
         /// <param name="typeId">The type identifier</param>
-        protected abstract TPackageInfo CreatePackageInfo(object message, Type messageType, int typeId);
-    }
-
-    /// <summary>
-    /// A concrete implementation of MessagePackPackageDecoder that returns the decoded object directly.
-    /// </summary>
-    public class MessagePackPackageDecoder : MessagePackPackageDecoder<object>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MessagePackPackageDecoder"/> class.
-        /// </summary>
-        /// <param name="typeRegistry">The MessagePack type registry to use for decoding</param>
-        public MessagePackPackageDecoder(MessagePackTypeRegistry typeRegistry) 
-            : base(typeRegistry)
+        protected virtual TPackageInfo CreatePackageInfo(object message, Type messageType, int typeId)
         {
-        }
-
-        /// <summary>
-        /// Returns the decoded message object directly.
-        /// </summary>
-        /// <param name="message">The decoded message</param>
-        /// <param name="messageType">The type of the message</param>
-        /// <param name="typeId">The type identifier</param>
-        /// <returns>The decoded message object</returns>
-        protected override object CreatePackageInfo(object message, Type messageType, int typeId)
-        {
-            return message;
+            return message as TPackageInfo ?? throw new InvalidOperationException($"Cannot cast message of type {message.GetType()} to {typeof(TPackageInfo)}");
         }
     }
 }

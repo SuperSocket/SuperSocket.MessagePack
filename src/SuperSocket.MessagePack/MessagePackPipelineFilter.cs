@@ -51,19 +51,4 @@ namespace SuperSocket.MessagePack
             return _decoder.Decode(ref buffer, null);
         }
     }
-
-    /// <summary>
-    /// A concrete implementation of MessagePackPipelineFilter for objects.
-    /// </summary>
-    public class MessagePackPipelineFilter : MessagePackPipelineFilter<object>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MessagePackPipelineFilter"/> class.
-        /// </summary>
-        /// <param name="decoder">The decoder to use for converting binary data to objects</param>
-        public MessagePackPipelineFilter(IPackageDecoder<object> decoder)
-            : base(decoder)
-        {
-        }
-    }
 }
