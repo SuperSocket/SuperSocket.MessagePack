@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <TargetFrameworks>$(DotNetTargetFrameworks)</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Description>SuperSocket MessagePack integration library providing efficient binary serialization and deserialization for network messages with cross-platform and cross-language compatibility.</Description>
   </PropertyGroup>

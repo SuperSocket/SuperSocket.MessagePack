@@ -7,8 +7,8 @@
     <!-- SuperSocket packages -->
     <PackageVersion Include="SuperSocket.ProtoBase" Version="2.0.0" />
     
-    <!-- Google packages -->
-    <PackageVersion Include="Google.Protobuf" Version="3.25.1" />
+    <!-- MessagePack package -->
+    <PackageVersion Include="MessagePack" Version="3.1.3" />
     
     <!-- Build and development tools -->
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />

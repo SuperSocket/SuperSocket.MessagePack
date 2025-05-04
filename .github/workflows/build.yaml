@@ -25,7 +25,7 @@ jobs:
               id: nbgv
             - name: Clean
               run: |
-                dotnet clean ./SuperSocket.ProtoBuf.sln --configuration Release
+                dotnet clean ./SuperSocket.MessagePack.sln --configuration Release
                 dotnet nuget locals all --clear
             - name: Build
               run: dotnet build -c Debug

@@ -47,19 +47,25 @@ namespace SuperSocket.MessagePack
             var messageType = message.GetType();
             int typeId = GetMessageTypeId(messageType);
 
+            // First serialize to memory to get the size
+            byte[] messageBytes = MessagePackSerializer.Serialize(message, _typeRegistry.Options);
+            int messageSize = messageBytes.Length;
+
             // Reserve space for the header (message size + type ID)
             var headerSegment = writer.GetSpan(8);
             writer.Advance(8);
 
-            // Serialize the message directly to the writer
-            var bytesWritten = MessagePackSerializer.Serialize(writer, message, messageType, _typeRegistry.Options);
+            // Write the message data
+            var messageSegment = writer.GetSpan(messageSize);
+            messageBytes.AsSpan().CopyTo(messageSegment);
+            writer.Advance(messageSize);
 
             // Write the header
-            BinaryPrimitives.WriteInt32BigEndian(headerSegment, bytesWritten); // Message size
+            BinaryPrimitives.WriteInt32BigEndian(headerSegment, messageSize); // Message size
             BinaryPrimitives.WriteInt32BigEndian(headerSegment.Slice(4), typeId); // Type ID
 
             // Return total bytes written (header + message)
-            return bytesWritten + 8;
+            return messageSize + 8;
         }
 
         /// <summary>

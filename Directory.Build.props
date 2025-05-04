@@ -9,7 +9,7 @@
     <MobileTargetFrameworks>net8.0-ios;net8.0-android;net8.0-macos;net8.0-tvos;net9.0-ios;net9.0-android;net9.0-macos;net9.0-tvos</MobileTargetFrameworks>
   </PropertyGroup>
   <PropertyGroup>    
-    <PackageProjectUrl>https://github.com/SuperSocket/SuperSocket.ProtoBuf</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/SuperSocket/SuperSocket.MessagePack</PackageProjectUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
