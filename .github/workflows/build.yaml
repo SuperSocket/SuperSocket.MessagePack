@@ -29,6 +29,10 @@ jobs:
                 dotnet nuget locals all --clear
             - name: Build
               run: dotnet build -c Debug
+            - name: Test
+              run: |
+                cd test/SuperSocket.MessagePack.Tests
+                dotnet test --logger "console;verbosity=detailed"
             - name: Pack
               run: dotnet pack -c Release -p:PackageVersion=${{ steps.nbgv.outputs.NuGetPackageVersion }}.${{ github.run_number }} -p:Version=${{ steps.nbgv.outputs.NuGetPackageVersion }}.${{ github.run_number }} -p:AssemblyVersion=${{ steps.nbgv.outputs.AssemblyVersion }} -p:AssemblyFileVersion=${{ steps.nbgv.outputs.AssemblyFileVersion }} -p:AssemblyInformationalVersion=${{ steps.nbgv.outputs.AssemblyInformationalVersion }} /p:NoPackageAnalysis=true /p:IncludeReleaseNotes=false
             - name: Push
