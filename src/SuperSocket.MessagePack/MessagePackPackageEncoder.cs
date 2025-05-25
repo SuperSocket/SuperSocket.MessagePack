@@ -14,7 +14,7 @@ namespace SuperSocket.MessagePack
     /// - 4 bytes for message size (big-endian)
     /// - 4 bytes for message type ID (big-endian)
     /// </remarks>
-    public abstract class MessagePackPackageEncoder<TPackageInfo> : IPackageEncoder<TPackageInfo>
+    public class MessagePackPackageEncoder<TPackageInfo> : IPackageEncoder<TPackageInfo>
     {
         private readonly MessagePackTypeRegistry _typeRegistry;
 

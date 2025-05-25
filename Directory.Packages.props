@@ -5,7 +5,9 @@
   
   <ItemGroup>
     <!-- SuperSocket packages -->
-    <PackageVersion Include="SuperSocket.ProtoBase" Version="2.0.0" />
+    <PackageVersion Include="SuperSocket.ProtoBase" Version="2.0.2-beta.1" />
+    <PackageVersion Include="SuperSocket" Version="2.0.2-beta.1" />
+    <PackageVersion Include="SuperSocket.Client" Version="2.0.2-beta.1" />
     
     <!-- MessagePack package -->
     <PackageVersion Include="MessagePack" Version="3.1.3" />

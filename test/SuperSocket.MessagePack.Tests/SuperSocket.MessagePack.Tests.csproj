@@ -14,6 +14,8 @@
     <PackageReference Include="xunit.runner.visualstudio" />
     <PackageReference Include="Moq" />
     <PackageReference Include="SuperSocket.ProtoBase" />
+    <PackageReference Include="SuperSocket" />
+    <PackageReference Include="SuperSocket.Client" />
     <PackageReference Include="MessagePack" />
   </ItemGroup>
 
