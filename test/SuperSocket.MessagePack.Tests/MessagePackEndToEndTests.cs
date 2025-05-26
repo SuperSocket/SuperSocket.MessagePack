@@ -36,13 +36,13 @@ namespace SuperSocket.MessagePack.Tests
             public int Id { get; set; }
 
             [Key(1)]
-            public string? Content { get; set; }
+            public string Content { get; set; }
         }
 
         public class TestMessagePackageInfo
         {
-            public object? Message { get; set; }
-            public Type? MessageType { get; set; }
+            public object Message { get; set; }
+            public Type MessageType { get; set; }
             public int TypeId { get; set; }
         }
 
@@ -80,8 +80,17 @@ namespace SuperSocket.MessagePack.Tests
             registry.Register<TestMessage>(1);
             
             // Set up server
-            using var server = await SetupServerAsync(registry);
-            
+            using var server = SetupServerAsync(
+                registry: registry,
+                packageHandler: async (session, package) =>
+                {
+                    var encoder = session.Server.ServiceProvider.GetRequiredService<IPackageEncoder<TestMessage>>();
+                    // Echo the message back to the client
+                    await session.SendAsync(encoder, package.Message as TestMessage).ConfigureAwait(false);
+                });
+
+            Assert.True(await server.StartAsync(CancellationToken.None));
+
             // Set up client
             var encoder = new TestMessagePackPackageEncoder(registry);
             var clientFilter = new MessagePackPipelineFilter<TestMessagePackageInfo>(new TestMessagePackPackageDecoder(registry));
@@ -120,12 +129,13 @@ namespace SuperSocket.MessagePack.Tests
             await client.CloseAsync();
         }
 
-        private async Task<IServer> SetupServerAsync(MessagePackTypeRegistry registry)
+        private IServer SetupServerAsync(MessagePackTypeRegistry registry, Func<IAppSession, TestMessagePackageInfo, ValueTask> packageHandler)
         {
-            var server = SuperSocketHostBuilder.Create<TestMessagePackageInfo>()
+            return SuperSocketHostBuilder.Create<TestMessagePackageInfo>()
                 .UsePackageDecoder<TestMessagePackPackageDecoder>()
                 .UsePipelineFilter<MessagePackPipelineFilter<TestMessagePackageInfo>>()
                 .UseSessionHandler(OnSessionConnected, OnSessionClosed)
+                .UsePackageHandler<TestMessagePackageInfo>(packageHandler)
                 .ConfigureSuperSocket(options =>
                 {
                     options.Name = "MessagePack Test Server";
@@ -140,12 +150,10 @@ namespace SuperSocket.MessagePack.Tests
                 })
                 .ConfigureServices((ctx, services) =>
                 {
+                    services.AddSingleton<IPackageEncoder<TestMessage>, TestMessagePackPackageEncoder>();
                     services.AddSingleton<MessagePackTypeRegistry>(registry);
                 })
                 .BuildAsServer();
-
-            await server.StartAsync();
-            return server;
         }
 
         private ValueTask OnSessionConnected(IAppSession session)

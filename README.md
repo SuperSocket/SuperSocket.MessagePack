@@ -41,6 +41,29 @@ Pipeline filter for handling MessagePack messages with fixed-length headers. The
 - First 4 bytes: Message size in big-endian format
 - Next 4 bytes: Message type ID in big-endian format
 
+#### Registering the Pipeline Filter (Recommended Approach)
+
+The recommended way to register the MessagePackPipelineFilter is using dependency injection:
+
+```csharp
+// Create server builder
+var server = SuperSocketHostBuilder.Create<YourPackageInfo>()
+    // Register your custom package decoder
+    .UsePackageDecoder<YourMessagePackDecoder>()
+    // Register the pipeline filter by type
+    .UsePipelineFilter<MessagePackPipelineFilter<YourPackageInfo>>()
+    // Register required services
+    .ConfigureServices((ctx, services) =>
+    {
+        // Register the type registry
+        services.AddSingleton<MessagePackTypeRegistry>(registry);
+        // Register other required services
+    })
+    .BuildAsServer();
+```
+
+This approach uses dependency injection to create and manage the pipeline filter, which makes testing easier and keeps your code more maintainable.
+
 ### MessagePackPackageEncoder
 
 Provides encoding functionality for MessagePack messages, transforming them into network-ready binary packets with proper header information.
@@ -55,23 +78,49 @@ Provides decoding functionality for binary data into MessagePack objects based o
 
 ```csharp
 // Create a type registry
-var typeRegistry = new MessagePackTypeRegistry();
+var registry = new MessagePackTypeRegistry();
 
 // Register your message types
-typeRegistry.RegisterMessageType(1, typeof(LoginRequest));
-typeRegistry.RegisterMessageType(2, typeof(LoginResponse));
+registry.RegisterMessageType(1, typeof(LoginRequest));
+registry.RegisterMessageType(2, typeof(LoginResponse));
 // Add more message types as needed...
-
-// Create your custom decoder and encoder
-var decoder = new YourMessagePackDecoder(typeRegistry);
-var encoder = new YourMessagePackEncoder(typeRegistry);
 
 // Configure SuperSocket server
 var server = SuperSocketHostBuilder.Create<YourPackageInfo>()
-    .UsePipelineFilter(serviceProvider => new MessagePackPipelineFilter<YourPackageInfo>(decoder))
-    .UsePackageEncoder(encoder)
-    // Add other necessary configurations
-    .Build();
+    // Register package decoder by type
+    .UsePackageDecoder<YourMessagePackDecoder>()
+    // Register pipeline filter by type
+    .UsePipelineFilter<MessagePackPipelineFilter<YourPackageInfo>>()
+    // Register session and package handlers
+    .UseSessionHandler(OnSessionConnected, OnSessionClosed)
+    .UsePackageHandler<YourPackageInfo>(async (session, package) =>
+    {
+        // Handle incoming messages
+        var encoder = session.Server.ServiceProvider.GetRequiredService<IPackageEncoder<ResponseMessage>>();
+        await session.SendAsync(encoder, new ResponseMessage()).ConfigureAwait(false);
+    })
+    // Configure server options
+    .ConfigureSuperSocket(options =>
+    {
+        options.Name = "MessagePack Server";
+        options.Listeners = new List<ListenOptions>
+        {
+            new ListenOptions
+            {
+                Ip = "127.0.0.1",
+                Port = 5000
+            }
+        };
+    })
+    // Register services
+    .ConfigureServices((ctx, services) =>
+    {
+        // Register type registry
+        services.AddSingleton<MessagePackTypeRegistry>(registry);
+        // Register message encoder
+        services.AddSingleton<IPackageEncoder<ResponseMessage>, YourMessagePackEncoder>();
+    })
+    .BuildAsServer();
 
 await server.StartAsync();
 ```
@@ -79,24 +128,38 @@ await server.StartAsync();
 ### Client-side Setup
 
 ```csharp
-// Use the same type registry with the same message type registrations as the server
-var typeRegistry = new MessagePackTypeRegistry();
-typeRegistry.RegisterMessageType(1, typeof(LoginRequest));
-typeRegistry.RegisterMessageType(2, typeof(LoginResponse));
+// Use the same type registry as the server
+var registry = new MessagePackTypeRegistry();
+registry.RegisterMessageType(1, typeof(LoginRequest));
+registry.RegisterMessageType(2, typeof(LoginResponse));
 // Add more message types as needed...
 
-// Create your custom client decoder and encoder
-var decoder = new YourMessagePackDecoder(typeRegistry);
-var encoder = new YourMessagePackEncoder(typeRegistry);
+// Create encoder and decoder instances
+var encoder = new YourMessagePackEncoder(registry);
+var decoder = new YourMessagePackDecoder(registry);
 
-// Create and connect your client
-var client = new EasyClient<YourPackageInfo>(new ClientPackageDecoder(decoder))
-    .UsePackageEncoder(encoder);
+// Create client filter and configure client
+var clientFilter = new MessagePackPipelineFilter<YourPackageInfo>(decoder);
+var client = new EasyClient<YourPackageInfo>(clientFilter)
+{
+    Security = new SecurityOptions { TargetHost = "localhost" }
+}.AsClient();
 
-await client.ConnectAsync(new IPEndPoint(IPAddress.Loopback, 4040));
-
-// Send a login request
-await client.SendAsync(new LoginRequest { Username = "user", Password = "pwd" });
+// Connect to server
+var connected = await client.ConnectAsync(new IPEndPoint(IPAddress.Loopback, 5000));
+if (connected)
+{
+    // Create and send a message
+    var loginRequest = new LoginRequest { Username = "user", Password = "pwd" };
+    await client.SendAsync(encoder, loginRequest);
+    
+    // Receive and process response
+    var response = await client.ReceiveAsync();
+    Console.WriteLine($"Received response of type: {response.TypeId}");
+    
+    // Close connection when done
+    await client.CloseAsync();
+}
 ```
 
 ## Implementing Custom Encoders and Decoders
